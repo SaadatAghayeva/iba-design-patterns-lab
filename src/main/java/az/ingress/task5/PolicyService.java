@@ -1,51 +1,32 @@
 package az.ingress.task5;
 
-/**
- * Avto sığorta polisinin yaradılması.
- */
 public class PolicyService {
 
-    /*
-     * TODO:
-     *  1. Polisə iki yeni, istəyə bağlı sahə əlavə et:
-     *       durationMonths - müddət, default 12. 12 deyilsə çıxışda ", 6 months" görünsün
-     *       email          - default yoxdur. Varsa çıxışda ", email nigar@mail.az" görünsün
-     *  2. Polis yaratmaq oxunaqlı olsun: hansı dəyərin hansı sahəyə getdiyi kodda aydın görünsün
-     *     (true, false, null ardıcıllıqları olmasın). Yeni sahə əlavə edəndə mövcud kodu dəyişmək lazım olmasın.
-     *  3. Məcburi sahələr yoxlanmalıdır. Yoxdursa, polis yaradılmasın və xəta versin:
-     *       "policyNo is required", "plate is required", "ownerName is required", "price must be positive"
-     *  4. Yaradılmış polis dəyişdirilə bilməz: sahələr final qalsın, setter olmasın.
-     */
     static class Policy {
-        private final String policyNo;       // məcburi
-        private final String plate;          // məcburi
-        private final String ownerName;      // məcburi
-        private final double price;          // məcburi
-        private final String driverName;     // istəyə bağlı
-        private final boolean glassCover;    // istəyə bağlı
-        private final boolean theftCover;    // istəyə bağlı
-        private final boolean roadAssistance; // istəyə bağlı
-        private final String discountCode;   // istəyə bağlı
+        private final String policyNo;
+        private final String plate;
+        private final String ownerName;
+        private final double price;
+        private final String driverName;
+        private final boolean glassCover;
+        private final boolean theftCover;
+        private final boolean roadAssistance;
+        private final String discountCode;
+        private final int durationMonths;
+        private final String email;
 
-        Policy(String policyNo, String plate, String ownerName, double price) {
-            this(policyNo, plate, ownerName, price, null, false, false, false, null);
-        }
-
-        Policy(String policyNo, String plate, String ownerName, double price, String driverName) {
-            this(policyNo, plate, ownerName, price, driverName, false, false, false, null);
-        }
-
-        Policy(String policyNo, String plate, String ownerName, double price, String driverName,
-               boolean glassCover, boolean theftCover, boolean roadAssistance, String discountCode) {
-            this.policyNo = policyNo;
-            this.plate = plate;
-            this.ownerName = ownerName;
-            this.price = price;
-            this.driverName = driverName;
-            this.glassCover = glassCover;
-            this.theftCover = theftCover;
-            this.roadAssistance = roadAssistance;
-            this.discountCode = discountCode;
+        private Policy(Builder builder) {
+            this.policyNo = builder.policyNo;
+            this.plate = builder.plate;
+            this.ownerName = builder.ownerName;
+            this.price = builder.price;
+            this.driverName = builder.driverName;
+            this.glassCover = builder.glassCover;
+            this.theftCover = builder.theftCover;
+            this.roadAssistance = builder.roadAssistance;
+            this.discountCode = builder.discountCode;
+            this.durationMonths = builder.durationMonths;
+            this.email = builder.email;
         }
 
         @Override
@@ -55,23 +36,147 @@ public class PolicyService {
                     + (glassCover ? ", glass" : "")
                     + (theftCover ? ", theft" : "")
                     + (roadAssistance ? ", road assistance" : "")
-                    + (discountCode != null ? ", discount " + discountCode : "");
+                    + (discountCode != null ? ", discount " + discountCode : "")
+                    + (durationMonths != 12 ? ", " + durationMonths + " months" : "")
+                    + (email != null ? ", email " + email : "");
+        }
+
+        static class Builder {
+            private String policyNo;
+            private String plate;
+            private String ownerName;
+            private double price;
+            private String driverName;
+            private boolean glassCover;
+            private boolean theftCover;
+            private boolean roadAssistance;
+            private String discountCode;
+            private int durationMonths = 12;
+            private String email;
+
+            public Builder withPolicyNo(String policyNo) {
+                this.policyNo = policyNo;
+                return this;
+            }
+
+            public Builder withPlate(String plate) {
+                this.plate = plate;
+                return this;
+            }
+
+            public Builder withOwnerName(String ownerName) {
+                this.ownerName = ownerName;
+                return this;
+            }
+
+            public Builder withPrice(double price) {
+                this.price = price;
+                return this;
+            }
+
+            public Builder withDriver(String driverName) {
+                this.driverName = driverName;
+                return this;
+            }
+
+            public Builder withGlassCover() {
+                this.glassCover = true;
+                return this;
+            }
+
+            public Builder withTheftCover() {
+                this.theftCover = true;
+                return this;
+            }
+
+            public Builder withRoadAssistance() {
+                this.roadAssistance = true;
+                return this;
+            }
+
+            public Builder withDiscountCode(String discountCode) {
+                this.discountCode = discountCode;
+                return this;
+            }
+
+            public Builder withDurationMonths(int durationMonths) {
+                this.durationMonths = durationMonths;
+                return this;
+            }
+
+            public Builder withEmail(String email) {
+                this.email = email;
+                return this;
+            }
+
+            public Policy build() {
+                if (policyNo == null) {
+                    throw new IllegalStateException("policyNo is required");
+                }
+                if (plate == null) {
+                    throw new IllegalStateException("plate is required");
+                }
+                if (ownerName == null) {
+                    throw new IllegalStateException("ownerName is required");
+                }
+                if (price <= 0) {
+                    throw new IllegalStateException("price must be positive");
+                }
+                return new Policy(this);
+            }
         }
     }
 
     public static void main(String[] args) {
-        Policy basic = new Policy("P-1", "10-AA-111", "Aysel Mammadova", 50);
-        Policy withDriver = new Policy("P-2", "90-BB-222", "Murad Aliyev", 50, "Leyla Aliyeva");
-        Policy full = new Policy("P-3", "77-CC-333", "Kamran Ismayilov", 50, null, true, false, true, "SPRING10");
+        Policy basic = new Policy.Builder()
+                .withPolicyNo("P-1")
+                .withPlate("10-AA-111")
+                .withOwnerName("Aysel Mammadova")
+                .withPrice(50)
+                .build();
 
-        System.out.println(basic);      // P-1: 10-AA-111, Aysel Mammadova, 50.0 AZN
-        System.out.println(withDriver); // P-2: 90-BB-222, Murad Aliyev, 50.0 AZN, driver Leyla Aliyeva
-        System.out.println(full);       // P-3: 77-CC-333, Kamran Ismayilov, 50.0 AZN, glass, road assistance, discount SPRING10
+        Policy withDriver = new Policy.Builder()
+                .withPolicyNo("P-2")
+                .withPlate("90-BB-222")
+                .withOwnerName("Murad Aliyev")
+                .withPrice(50)
+                .withDriver("Leyla Aliyeva")
+                .build();
 
-        // TODO: dəyişikliklərdən sonra yuxarıdakı 3 polisi yeni üsulla yarat (çıxış dəyişməməlidir) və bunları əlavə et:
-        //   P-4, 10-DD-444, Nigar Guliyeva, 30 AZN, oğurluq, 6 ay, email nigar@mail.az
-        //     -> P-4: 10-DD-444, Nigar Guliyeva, 30.0 AZN, theft, 6 months, email nigar@mail.az
-        //   P-5, nömrəsiz (plate yoxdur), Elvin Babayev, 50 AZN
-        //     -> Error: plate is required
+        Policy full = new Policy.Builder()
+                .withPolicyNo("P-3")
+                .withPlate("77-CC-333")
+                .withOwnerName("Kamran Ismayilov")
+                .withPrice(50)
+                .withGlassCover()
+                .withRoadAssistance()
+                .withDiscountCode("SPRING10")
+                .build();
+
+        Policy sixMonths = new Policy.Builder()
+                .withPolicyNo("P-4")
+                .withPlate("10-DD-444")
+                .withOwnerName("Nigar Guliyeva")
+                .withPrice(30)
+                .withTheftCover()
+                .withDurationMonths(6)
+                .withEmail("nigar@mail.az")
+                .build();
+
+        System.out.println(basic);
+        System.out.println(withDriver);
+        System.out.println(full);
+        System.out.println(sixMonths);
+
+        try {
+            Policy noPlate = new Policy.Builder()
+                    .withPolicyNo("P-5")
+                    .withOwnerName("Elvin Babayev")
+                    .withPrice(50)
+                    .build();
+            System.out.println(noPlate);
+        } catch (IllegalStateException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
